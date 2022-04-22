@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"gorm.io/gorm"
 	"mall/app/model"
 )
@@ -52,6 +51,12 @@ func QueryMerchId(id uint) (merch *model.Merchandise) {
 	return merch
 }
 
+// QueryCategoryId 根据种类Id获取商品信息
+func QueryCategoryId(categoryId uint) (merch []model.Merchandise) {
+	db.Where("category_id = ?", categoryId).Find(&merch)
+	return merch
+}
+
 // UpdateMerch 根据id更新商品信息
 func UpdateMerch(id uint, name string, inventory uint, price float64, categoryID uint) {
 	db.Model(&model.Merchandise{}).Where("id = ?", id).Updates(model.Merchandise{
@@ -65,5 +70,4 @@ func UpdateMerch(id uint, name string, inventory uint, price float64, categoryID
 // DeleteMerchId 根据商品ID删除商品信息
 func DeleteMerchId(id uint) {
 	db.Where("id = ?", id).Delete(&model.Merchandise{})
-	fmt.Println(model.Merchandise{})
 }

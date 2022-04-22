@@ -1,37 +1,46 @@
 package service
 
-import "mall/app/model"
+import (
+	"mall/app/model"
+)
 
-var shoppingCart model.ShoppingCart
-
-// InsertShoppingCart 把购物车信息写入数据库
-func InsertShoppingCart(merchandiseId uint, num uint) *model.ShoppingCart {
+// InsertCart 把购物车信息写入数据库
+func InsertCart(merchandiseId uint, num uint, sumPrice float64) {
 	db.Create(&model.ShoppingCart{
 		MerchandiseID: merchandiseId,
 		Num:           num,
+		SumPrice:      sumPrice,
 	})
-	return &shoppingCart
 }
 
-// QueryShoppingCart 根据id获取购物车信息
-func QueryShoppingCart(id uint) *model.ShoppingCart {
-	db.Where("id = ?", id).First(&shoppingCart)
-	return &shoppingCart
+// QueryCartId 根据id获取购物车信息
+func QueryCartId(id uint) (cart *model.ShoppingCart) {
+	db.Where("id = ?", id).Find(&cart)
+	return cart
 }
 
-// UpdateShoppingCart 根据id更新购物车信息
-func UpdateShoppingCart(id uint, num uint) *model.ShoppingCart {
-	db.Model(&model.ShoppingCart{}).Where("id = ?", id).Update("num = ?", num)
-	return &shoppingCart
+// QueryCart 获取购物车信息
+func QueryCart(page int, pageSize int) (cart []model.ShoppingCart) {
+	db.Scopes(Paginate(page, pageSize)).Find(&cart)
+	return cart
 }
 
-// DeleteShoppingCart 根据id删除购物车信息
-func DeleteShoppingCart(id uint) {
+// QueryCartMerchId 根据商品Id购物车信息
+func QueryCartMerchId(id uint) (cart *model.ShoppingCart) {
+	db.Where("merchandise_id = ?", id).Find(&cart)
+	return cart
+}
+
+// UpdateCart 根据id更新购物车信息
+func UpdateCart(id uint, num uint, sumPrice float64, merchandiseId uint) {
+	db.Model(&model.ShoppingCart{}).Where("id = ?", id).Updates(model.ShoppingCart{
+		Num:           num,
+		SumPrice:      sumPrice,
+		MerchandiseID: merchandiseId,
+	})
+}
+
+// DeleteCart 根据id删除购物车信息
+func DeleteCart(id uint) {
 	db.Where("id = ?", id).Delete(&model.ShoppingCart{})
-}
-
-// AddMerchandise 添加商品到购物车
-func AddMerchandise(merchandiseId uint, num uint) *float64 {
-
-	return &shoppingCart.SumPrice
 }
