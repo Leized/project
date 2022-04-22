@@ -7,33 +7,32 @@ import (
 	"mall/app/service"
 )
 
-var Merch = apiMerch{}
+var Cate = apiCate{}
 
-type apiMerch struct{}
+type apiCate struct{}
 
-// PostMerch 商品上架
-func (*apiMerch) PostMerch(r *ghttp.Request) {
-	var req model.Merchandise
+// PostCate 增加分类
+func (*apiCate) PostCate(r *ghttp.Request) {
+	var req model.Category
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
 	} else {
-
-		merch := service.QueryMerchName(req.Name)
-		if merch.ID > 0 {
+		cate := service.QueryKind(req.Kind)
+		if cate.ID > 0 {
 			err = r.Response.WriteJsonP(g.Map{
 				"code":    1,
-				"message": "该商品已上架，不可重复操作",
+				"message": "该种类已存在，不可重复操作",
 			})
 			if err != nil {
 				return
 			}
 		} else {
-			service.InsertMerch(req.Name, req.Inventory, req.Price, req.CategoryID)
-			merch1 := service.QueryMerchName(req.Name)
-			if merch1.ID > 0 {
+			service.InsertCate(req.Class, req.Kind)
+			cate1 := service.QueryKind(req.Kind)
+			if cate1.ID > 0 {
 				err = r.Response.WriteJsonP(g.Map{
 					"code":    0,
-					"message": "上架成功",
+					"message": "种类增加成功",
 				})
 				if err != nil {
 					return
@@ -51,8 +50,8 @@ func (*apiMerch) PostMerch(r *ghttp.Request) {
 	}
 }
 
-// ListMerch 商品列表
-func (*apiMerch) ListMerch(r *ghttp.Request) {
+// ListCate 分类列表
+func (*apiCate) ListCate(r *ghttp.Request) {
 	var req model.Paginate
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
@@ -60,7 +59,7 @@ func (*apiMerch) ListMerch(r *ghttp.Request) {
 		err = r.Response.WriteJsonExit(model.DataRes{
 			Code:    0,
 			Message: "OK",
-			Data:    service.QueryMerch(req.Page, req.PageSize),
+			Data:    service.QueryCate(req.Page, req.PageSize),
 		})
 		if err != nil {
 			return
@@ -68,13 +67,13 @@ func (*apiMerch) ListMerch(r *ghttp.Request) {
 	}
 }
 
-// GetMerch 获取商品详情
-func (*apiMerch) GetMerch(r *ghttp.Request) {
-	var req model.Merchandise
+// GetCate 获取种类列表
+func (*apiCate) GetCate(r *ghttp.Request) {
+	var req model.Category
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
 	} else {
-		dataList := service.QueryMerchId(req.ID)
+		dataList := service.QueryClass(req.Class)
 		err = r.Response.WriteJsonExit(model.DataRes{
 			Code:    0,
 			Message: "OK",
@@ -86,33 +85,15 @@ func (*apiMerch) GetMerch(r *ghttp.Request) {
 	}
 }
 
-// GetCateMerch 分类获取商品信息
-func (*apiMerch) GetCateMerch(r *ghttp.Request) {
-	var req model.Merchandise
+// PatchCate 分类修改
+func (*apiCate) PatchCate(r *ghttp.Request) {
+	var req *model.Category
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
 	} else {
-		dataList := service.QueryCategoryId(req.CategoryID)
-		err = r.Response.WriteJsonExit(model.DataRes{
-			Code:    0,
-			Message: "OK",
-			Data:    dataList,
-		})
-		if err != nil {
-			return
-		}
-	}
-}
-
-// PatchMerch 商品修改
-func (*apiMerch) PatchMerch(r *ghttp.Request) {
-	var req *model.Merchandise
-	if err := r.Parse(&req); err != nil {
-		service.ReqError(r)
-	} else {
-		service.UpdateMerch(req.ID, req.Name, req.Inventory, req.Price, req.CategoryID)
-		merch := service.QueryMerchId(req.ID)
-		if merch.Name == req.Name && merch.Inventory == req.Inventory && merch.Price == req.Price && merch.CategoryID == req.CategoryID {
+		service.UpdateCate(req.ID, req.Class, req.Kind)
+		cate := service.QueryId(req.ID)
+		if cate.Class == req.Class && cate.Kind == req.Kind {
 			err = r.Response.WriteJsonP(g.Map{
 				"code":    0,
 				"message": "修改成功",
@@ -132,15 +113,15 @@ func (*apiMerch) PatchMerch(r *ghttp.Request) {
 	}
 }
 
-// DeleteMerch 商品下架
-func (*apiMerch) DeleteMerch(r *ghttp.Request) {
-	var req *model.Merchandise
+// DeleteCate 删除种类
+func (*apiCate) DeleteCate(r *ghttp.Request) {
+	var req *model.Category
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
 	} else {
-		service.DeleteMerchId(req.ID)
-		merch := service.QueryMerchId(req.ID)
-		if merch.ID > 0 {
+		service.DeleteCateId(req.ID)
+		cate := service.QueryId(req.ID)
+		if cate.ID > 0 {
 			err = r.Response.WriteJsonP(g.Map{
 				"code":    1,
 				"message": "删除失败",

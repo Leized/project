@@ -15,7 +15,7 @@ type Merchandise struct {
 type Category struct {
 	gorm.Model
 	Class string //类别
-	Kind  string //种类
+	Kind  string `gorm:"unique;not null;comment:种类"` //种类
 }
 
 // ShoppingCart 购物车

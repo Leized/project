@@ -1,18 +1,19 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
 	"mall/app/model"
 	"mall/app/service"
 )
 
-var Merch = apiMerch{}
+var cart = apiCart{}
 
-type apiMerch struct{}
+type apiCart struct{}
 
-// PostMerch 商品上架
-func (*apiMerch) PostMerch(r *ghttp.Request) {
+// PostCart 商品上架
+func (*apiCart) PostCart(r *ghttp.Request) {
 	var req model.Merchandise
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
@@ -51,8 +52,8 @@ func (*apiMerch) PostMerch(r *ghttp.Request) {
 	}
 }
 
-// ListMerch 商品列表
-func (*apiMerch) ListMerch(r *ghttp.Request) {
+// ListCart 商品列表
+func (*apiCart) ListCart(r *ghttp.Request) {
 	var req model.Paginate
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
@@ -68,8 +69,8 @@ func (*apiMerch) ListMerch(r *ghttp.Request) {
 	}
 }
 
-// GetMerch 获取商品详情
-func (*apiMerch) GetMerch(r *ghttp.Request) {
+// GetCart 获取商品详情
+func (*apiCart) GetCart(r *ghttp.Request) {
 	var req model.Merchandise
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
@@ -86,26 +87,8 @@ func (*apiMerch) GetMerch(r *ghttp.Request) {
 	}
 }
 
-// GetCateMerch 分类获取商品信息
-func (*apiMerch) GetCateMerch(r *ghttp.Request) {
-	var req model.Merchandise
-	if err := r.Parse(&req); err != nil {
-		service.ReqError(r)
-	} else {
-		dataList := service.QueryCategoryId(req.CategoryID)
-		err = r.Response.WriteJsonExit(model.DataRes{
-			Code:    0,
-			Message: "OK",
-			Data:    dataList,
-		})
-		if err != nil {
-			return
-		}
-	}
-}
-
-// PatchMerch 商品修改
-func (*apiMerch) PatchMerch(r *ghttp.Request) {
+// PatchCart 商品修改
+func (*apiCart) PatchCart(r *ghttp.Request) {
 	var req *model.Merchandise
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
@@ -132,14 +115,17 @@ func (*apiMerch) PatchMerch(r *ghttp.Request) {
 	}
 }
 
-// DeleteMerch 商品下架
-func (*apiMerch) DeleteMerch(r *ghttp.Request) {
+// DeleteCart 商品下架
+func (*apiCart) DeleteCart(r *ghttp.Request) {
+	//name string, inventory uint, price float64
 	var req *model.Merchandise
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
 	} else {
 		service.DeleteMerchId(req.ID)
+		fmt.Println(req.ID)
 		merch := service.QueryMerchId(req.ID)
+		fmt.Println(merch.ID)
 		if merch.ID > 0 {
 			err = r.Response.WriteJsonP(g.Map{
 				"code":    1,
