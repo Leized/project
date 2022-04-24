@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
 	"mall/app/model"
@@ -17,11 +18,12 @@ func (*apiCart) PostCart(r *ghttp.Request) {
 	if err := r.Parse(&req); err != nil {
 		service.ReqError(r)
 	} else {
-		cart := service.QueryCartMerchId(req.MerchandiseID)
+		cart := service.QueryUserIdAndMerchId(req.UserID, req.MerchandiseID)
+		fmt.Println(cart)
 		if cart.ID > 0 {
-			//购物车已经有该商品，进行更新即可
+			//该用户的购物车已经有该商品，进行更新即可
 			service.UpdateCart(cart.ID, req.Num+cart.Num, req.SumPrice+cart.SumPrice, req.MerchandiseID)
-			cart1 := service.QueryCartMerchId(req.MerchandiseID)
+			cart1 := service.QueryUserIdAndMerchId(req.UserID, req.MerchandiseID)
 			if cart1.Num == req.Num+cart.Num && cart1.SumPrice == req.SumPrice+cart.SumPrice {
 				err = r.Response.WriteJsonP(g.Map{
 					"code":    0,
@@ -40,8 +42,8 @@ func (*apiCart) PostCart(r *ghttp.Request) {
 				}
 			}
 		} else {
-			service.InsertCart(req.MerchandiseID, req.Num, req.SumPrice)
-			cart := service.QueryCartMerchId(req.MerchandiseID)
+			service.InsertCart(req.UserID, req.MerchandiseID, req.Num, req.SumPrice)
+			cart := service.QueryUserIdAndMerchId(req.UserID, req.MerchandiseID)
 			if cart.ID > 0 {
 				err = r.Response.WriteJsonP(g.Map{
 					"code":    0,
@@ -72,7 +74,7 @@ func (*apiCart) ListCart(r *ghttp.Request) {
 		err = r.Response.WriteJsonExit(model.DataRes{
 			Code:    0,
 			Message: "OK",
-			Data:    service.QueryCart(req.Page, req.PageSize),
+			Data:    service.QueryCartUserId(req.UserID, req.Page, req.PageSize),
 		})
 		if err != nil {
 			return
@@ -87,7 +89,7 @@ func (*apiCart) PatchCart(r *ghttp.Request) {
 		service.ReqError(r)
 	} else {
 		service.UpdateCart(req.ID, req.Num, req.SumPrice, req.MerchandiseID)
-		cart := service.QueryCartMerchId(req.MerchandiseID)
+		cart := service.QueryUserIdAndMerchId(req.UserID, req.MerchandiseID)
 		if cart.Num == req.Num && cart.SumPrice == req.SumPrice {
 			err = r.Response.WriteJsonP(g.Map{
 				"code":    0,

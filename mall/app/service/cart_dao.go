@@ -5,8 +5,9 @@ import (
 )
 
 // InsertCart 把购物车信息写入数据库
-func InsertCart(merchandiseId uint, num uint, sumPrice float64) {
+func InsertCart(userId int, merchandiseId uint, num uint, sumPrice float64) {
 	db.Create(&model.ShoppingCart{
+		UserID:        userId,
 		MerchandiseID: merchandiseId,
 		Num:           num,
 		SumPrice:      sumPrice,
@@ -19,15 +20,15 @@ func QueryCartId(id uint) (cart *model.ShoppingCart) {
 	return cart
 }
 
-// QueryCart 获取购物车信息
-func QueryCart(page int, pageSize int) (cart []model.ShoppingCart) {
-	db.Scopes(Paginate(page, pageSize)).Find(&cart)
+// QueryCartUserId 根据用户Id获取购物车信息
+func QueryCartUserId(userId int, page int, pageSize int) (cart []model.ShoppingCart) {
+	db.Where("user_id = ?", userId).Scopes(Paginate(page, pageSize)).Find(&cart)
 	return cart
 }
 
-// QueryCartMerchId 根据商品Id购物车信息
-func QueryCartMerchId(id uint) (cart *model.ShoppingCart) {
-	db.Where("merchandise_id = ?", id).Find(&cart)
+// QueryUserIdAndMerchId 根据用户Id和商品Id获取购物车信息
+func QueryUserIdAndMerchId(userId int, merchandiseId uint) (cart *model.ShoppingCart) {
+	db.Where(&model.ShoppingCart{UserID: userId, MerchandiseID: merchandiseId}).First(&cart)
 	return cart
 }
 

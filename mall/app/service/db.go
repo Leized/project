@@ -30,4 +30,8 @@ func init() {
 	if err != nil {
 		return
 	}
+	err = db.AutoMigrate(&model.Order{})
+	if err != nil {
+		return
+	}
 }

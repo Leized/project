@@ -11,6 +11,11 @@ func init() {
 	s.Group("/", func(group *ghttp.RouterGroup) {
 		group.ALL("/hello", api.Hello)
 	})
+	s.Group("/", func(group *ghttp.RouterGroup) {
+		//group.ALL("/hello", api.Hello)
+		group.ALL("/register", api.Register)
+		group.ALL("/login", api.Login)
+	})
 	s.Group("/merch", func(group *ghttp.RouterGroup) {
 		group.POST("/post", api.Merch.PostMerch)
 		group.GET("/list", api.Merch.ListMerch)
@@ -31,5 +36,13 @@ func init() {
 		group.GET("/list", api.Cart.ListCart)
 		group.PATCH("/patch", api.Cart.PatchCart)
 		group.DELETE("/delete", api.Cart.DeleteCart)
+	})
+	s.Group("/order", func(group *ghttp.RouterGroup) {
+		group.POST("/post", api.Order.PostOrder)
+		group.GET("/list", api.Order.ListOrder)
+		group.GET("/list/state", api.Order.ListStateOrder)
+		group.GET("/get", api.Order.GetOrder)
+		group.PATCH("/patch", api.Order.PatchOrder)
+		group.DELETE("/delete", api.Order.DeleteOrder)
 	})
 }
